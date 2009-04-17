@@ -56,6 +56,17 @@
 
 #include <asm/unistd.h>
 
+//ADDED not sure how many groups there could be so i made it 9999
+#define countsize=9999;
+int count_array[countsize];
+int z=0;
+while(z!=countsize)
+{
+	count_array[z]=0;
+	z++;
+}
+
+
 /*
  * Convert user-nice values [ -20 ... 0 ... 19 ]
  * to static priority [ MAX_RT_PRIO..MAX_PRIO-1 ],
@@ -3289,6 +3300,30 @@ static inline int interactive_sleep(enum sleep_type sleep_type)
 		sleep_type == SLEEP_INTERRUPTED);
 }
 
+//ADDED new scheduler function
+asmlinkage void __SCHEDFSG SCHED_FSG(void)
+{
+	int groupcount=0;
+	z=0;
+	while(z!=countsize)
+	{
+		if(count_array[z]!=0)
+		{
+			//finding how many groups are there
+			groupcount++;
+		}
+		z++;
+	}
+	//enqueue_task()
+	//dequeue_task()
+	//requeue_task()
+	//enqueue_task_head()
+	
+	
+
+}
+
+
 /*
  * schedule() is the main scheduler function.
  */
@@ -4064,6 +4099,11 @@ static void __setscheduler(struct task_struct *p, int policy, int prio)
 
 	p->policy = policy;
 	p->rt_priority = prio;
+	
+	//ADDED priority will be the groups
+	z=count_array[prio];
+	count_array[prio]=count_array[z++];
+	
 	p->normal_prio = normal_prio(p);
 	/* we are holding p->pi_lock already */
 	p->prio = rt_mutex_getprio(p);

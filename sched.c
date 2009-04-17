@@ -57,6 +57,7 @@
 #include <asm/unistd.h>
 
 //ADDED not sure how many groups there could be so i made it 9999
+#define SCHED_FSG;
 #define countsize=9999;
 int count_array[countsize];
 int z=0;

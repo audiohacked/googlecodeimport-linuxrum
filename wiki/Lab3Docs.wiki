@@ -2,7 +2,10 @@ Corey Brown
 Sean Nelson
 Andrew Murtland
 
-Please note that we are using kernel version 2.6.28.8 because of compatibility issues. Sean is on Mac OSX, and the lab version does not compile readily, so he found a version that does, with less configuring effort. I'm (Corey) on 64-bit Linux, which is the same story. We made sure this was ok with Song, and he said it was fine as long as we demonstrated that it worked to the TA.
+Introduction
+
+In this lab, we implemented many different things. We had to implement a Fair-share group scheduling which is scheduling strategy for computer operating systems in which the CPU usage is equally distributed among system task groups, as opposed to equal distribution among tasks.
+
 
 1.We needed a mechanism that keeps track of how many groups are active.
 
@@ -50,3 +53,9 @@ Detailed explanation of what schedule() does:
 5.We needed to modify sched.h to include our scheduler mode
 
 Within sched.h are definitions of each scheduler mode, and a number associated with them. This is so that we can use “sched_setscheduler(pid_t pid)” to set the scheduler policy, rather than modifying the scheduler that is in place. As required, we added a “#define SCHED_FSG” in addition to the pre-existing scheduler modes.
+
+Scheduler
+For the scheduler redesign, we decided modify sched.c to use the priorities as part of the different groups. In order to make it easier to see which groups had process's in there Queue we added an array which did not just say how many Queues there where but also how much was in each Queue which is needed in Fair-share group scheduling for its deciding how much time to give each process. This was achieved by adding a new function SCHED_FSG which was made to do the main parts of this assignment. Inside SCHED_FSG we decided to use FIFO for the scheduling of the next process to run with in its process group. we could have used RR in place of FIFO but that would have taken longer then FIFO so we decided to use FIFO.
+
+pro/cons
+There are a few pros and cons to this approach. One pro is that using the already created priority levels as there groups makes it easier. A con however to reusing them is there maybe so unexpected bugs later.

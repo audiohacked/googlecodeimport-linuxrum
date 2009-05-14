@@ -8,7 +8,14 @@ Lab 4 is about memory management. Specifically pages. Part I deals with reportin
 We decided to call the directory that contains our system call 'rum', since that's the name of our group. We called the function itself mem_stats, and it returns an int pointer, which in turn has 7 values, each corresponding to those required in the lab.
 
 Also added rum/ to the core-y          += kernel/ mm/ fs/ ipc/ security/ crypto/ block/ 
-line in the Makefile in the top level of the kernel, line 555.
+line in the Makefile in the top level of the kernel, line 555. Then added a Makefile to the rum/ directory with the following contents:
+
+obj-y   := mem_stats.o
+
+Then we added the following lines to include/asm-x86-64/unistd.h:
+
+#define __NR_mem_stats          280
+__SYSCALL(__NR_mem_stats, sys_mem_stats)
 
 
 In this part, you are asked to collect a number of memory management statistics:

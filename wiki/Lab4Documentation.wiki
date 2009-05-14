@@ -7,22 +7,36 @@ Lab 4 is about memory management. Specifically pages. Part I deals with reportin
 = Part I =
 In this part, you are asked to collect a number of memory management statistics:
 
-   1. the current number of pages in the active list (over all memory zones);
+1. the current number of pages in the active list (over all memory zones);
 
-   2. the current number of pages in the inactive list (over all memory zones);
+2. the current number of pages in the inactive list (over all memory zones);
 
-   3. the current number of pages in the active list whose reference bits are set (over all memory zones);
+3. the current number of pages in the active list whose reference bits are set (over all memory zones);
 
-   4. the current number of pages in the inactive list whose reference bits are set (over all memory zones);
+4. the current number of pages in the inactive list whose reference bits are set (over all memory zones);
 
-   5. the cumulative number of pages moved from the active list to the inactive list (since the last machine boot);
+5. the cumulative number of pages moved from the active list to the inactive list (since the last machine boot);
 
-   6. the cumulative number of pages evicted from the inactive list (since the last machine boot);
+6. the cumulative number of pages evicted from the inactive list (since the last machine boot);
 
-   7. a list of the number of pages allocated to all active processes.
+7. a list of the number of pages allocated to all active processes.
 
 Provide a system call that reports these statistics to user level applications.
 
 For each of statistics 3, 4, 5, 6, you should provide a program that triggers the statistics change and reason about such change. Take statistics 6 (the cumulative number of pages evicted from the inactive list) as an example, you should provide a program that triggers additional page evictions from the inactive list so the reported statistics 6 will change after you run the program. It is OK if you use one program to trigger the changes of multiple statistics as long as you can reason about these changes. 
 
 = Part II =
+
+In this part, you are asked to replace the second-chance LRU approximation algorithm in both the active and inactive lists with a counter-based clock algorithm:
+
+1. Keep a reference counter for each frame, which is set at 0 initially.
+
+2. When try_to_free_pages() is called, you scan a frame in the following way. First, you add the reference bit value to the frame reference counter (and clear the reference bit at the same time). Then you check the reference counter. If the counter is 0, you evict the page. Otherwise, you decrement the counter by 1 and move the frame to the back of list (as the original second-chance LRU approximation normally does).
+
+3. Action #2 (above) alone will result in a replacement algorithm equivalent to the original second-chance LRU approximation. To effectively utilize the reference counter, you need additional counter maintenance at other occasions. To this end, you should scan the frames periodically (e.g., as part of the timer interrupt) and add the reference bit value to the frame reference counter (and clear the reference bit at the same time).
+
+4. Note that the reference counter may overflow. If the reference counter is already at its maximum value, keep it unchanged when adding the reference bit to it.
+
+Note that we only ask you to replace the existing LRU approximation algorithm in each list with a new one. You can leave the basic Linux two-list memory management in place. Also, you do not need to mess around how Linux handles dirty page eviction. If a frame to be freed contains a dirty page, it will have to be swapped out, but this shouldn't affect your decision of which frame to free.
+
+Write a user program that you can use to test your page replacement implementation and compare it against the default page replacement algorithm in Linux. Include in your writeup an explanation of how it works and why it is useful for comparing the page replacement implementations. Describe the experiments you ran and explain the measurements you obtained. Explain the different performance of the two algorithms (or the lack thereof) and how this is justified based on the design/implementation of the two algorithms. 

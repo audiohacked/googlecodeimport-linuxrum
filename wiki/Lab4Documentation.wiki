@@ -8,7 +8,7 @@ Lab 4 is about memory management. Specifically pages. Part I deals with reportin
 We decided to call the directory that contains our system call 'rum', since that's the name of our group. We called the function itself mem_stats, and it returns an int pointer, which in turn has 7 values, each corresponding to those required in the lab.
 
 Also added rum/ to the core-y          += kernel/ mm/ fs/ ipc/ security/ crypto/ block/ 
-line in the Makefile in the top level of the kernel.
+line in the Makefile in the top level of the kernel, line 555.
 
 
 In this part, you are asked to collect a number of memory management statistics:

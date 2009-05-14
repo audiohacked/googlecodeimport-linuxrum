@@ -1,0 +1,9 @@
+#summary This is where our documentation for the final lab goes.
+
+= Introduction =
+Lab 4 is about memory management. Specifically pages. Part I deals with reporting memory management statistics. Part II deals with replacing the page replacement algorithm.
+
+
+= Part I =
+
+= Part II =

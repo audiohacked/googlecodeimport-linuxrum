@@ -41,6 +41,10 @@ For each of statistics 3, 4, 5, 6, you should provide a program that triggers th
 
 = Part II =
 
+Scanning code for reference count:
+
+Within shrink_active_list, it isolates all of LRU pages to a holding list. It loops through the list. For each page, there's a reference count. For each page that's referenced, our code increments ref_count, which holds the reference count for the page. The function called page_referenced will check if the reference bit flag of the page is set, and if it is, it adds it to the reference count. Then, after that, it removes the page from the zone's active list. It'll check if the page is mapped, and if so, it does another check to reclaim.
+
 In this part, you are asked to replace the second-chance LRU approximation algorithm in both the active and inactive lists with a counter-based clock algorithm:
 
 1. Keep a reference counter for each frame, which is set at 0 initially.

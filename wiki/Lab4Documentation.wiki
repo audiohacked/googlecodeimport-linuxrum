@@ -14,8 +14,9 @@ obj-y   := mem_stats.o
 
 Then we added the following lines to include/asm-x86-64/unistd.h:
 
-#define __NR_mem_stats          280
-__SYSCALL(__NR_mem_stats, sys_mem_stats)
+`#define __NR_mem_stats          280`
+
+`__SYSCALL(__NR_mem_stats, sys_mem_stats)`
 
 
 In this part, you are asked to collect a number of memory management statistics:

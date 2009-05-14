@@ -18,6 +18,8 @@ Then we added the following lines to include/asm-x86-64/unistd.h:
 
 `__SYSCALL(__NR_mem_stats, sys_mem_stats)`
 
+In order to get the statistics from memory, we investigated `get_zone_counts` and `__get_zone_counts` in mm/vmstat.c, line 17 and 33, respectively; these functions get the number of active, inactive, and free pages from each zone. This in turn led us to the zone struct, which is locate in include/linux/mmzone.h, line 139
+
 = Part II =
 
 Scanning code for reference count:

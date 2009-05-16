@@ -112,3 +112,44 @@ asmlinkage int sys_mem_stats(void __user *to, void __user *from, int n)
 Scanning code for reference count:
 
 Within shrink_active_list, it isolates all of LRU pages to a holding list. It loops through the list. For each page, there's a reference count. For each page that's referenced, our code increments ref_count, which holds the reference count for the page. The function called page_referenced will check if the reference bit flag of the page is set, and if it is, it adds it to the reference count. Then, after that, it removes the page from the zone's active list. It'll check if the page is mapped, and if so, it does another check to reclaim.
+
+These changes are implemented with the following patch:
+
+{{{
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index f0b135c..92dd9b8 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -267,6 +267,7 @@ struct page {
+ 	void *virtual;			/* Kernel virtual address (NULL if
+ 					   not kmapped, ie. highmem) */
+ #endif /* WANT_PAGE_VIRTUAL */
++	unsigned long ref_count;
+ };
+ 
+ #define page_private(page)		((page)->private)
+diff --git a/mm/vmscan.c b/mm/vmscan.c
+index a04fb41..ff45578 100644
+--- a/mm/vmscan.c
++++ b/mm/vmscan.c
+@@ -793,11 +793,18 @@ static void shrink_active_list(unsigned long nr_pages, struct zone *zone,
+ 	while (!list_empty(&l_hold)) {
+ 		cond_resched();
+ 		page = lru_to_page(&l_hold);
++		if (page->ref_count >= sizeof(unsigned long)) {
++			page->ref_count += page_referenced(page, 0);
++		}
++		else if (page->ref_count < 0) {
++			page->ref_count = 0;
++		}
+ 		list_del(&page->lru);
+ 		if (page_mapped(page)) {
+ 			if (!reclaim_mapped ||
+ 			    (total_swap_pages == 0 && PageAnon(page)) ||
+-			    page_referenced(page, 0)) {
++			    (page->ref_count > 0)) {
++				page->ref_count--;
+ 				list_add(&page->lru, &l_active);
+ 				continue;
+ 			}
+}}}

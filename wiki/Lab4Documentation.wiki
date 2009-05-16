@@ -52,9 +52,33 @@ void __get_zone_counts(unsigned long *active, unsigned long *inactive,
 }
 }}}
 
-I adopted the code from that function with:
+I adopted the code from that function to:
 
 {{{
+#include <linux/slab.h>
+#include <asm/uaccess.h>
+#include <linux/config.h>
+#include <linux/mm.h>
+#include <linux/module.h>
+#include <linux/cpu.h>
+#include <linux/mmzone.h>
+
+/*This is the file that will
+contain the code for the system
+call needed for part I, which reports
+the following statistics to a user level
+application:
+1. current number of pages in active list over all memory zones
+2. current number of pages in inactive list over all memory zone
+3. current number of pages in the active list whose reference bits
+	are set over all memory zones
+4. current number of pages in inactive list whose ref bits are set
+5. cumulative number of pages moved from the active list to the
+	inactive list since the last machine boot.
+6. cumulative number of pages evicted from the inactive list since last boot
+7. a list of the number of pages allocated to all active processes.
+*/
+
 void __mem_stats(unsigned long *stats, struct pglist_data *pgdat)
 {
 	struct zone *zones = pgdat->node_zones;
@@ -105,7 +129,35 @@ asmlinkage int sys_mem_stats(void __user *to, void __user *from, int n)
 	//to = stats;
 	return 0;
 }
+
+}
 }}}
+
+This code should work fine, with the following as test code:
+
+{{{
+#define SYS_MEM_STATS 280
+#include <stdio.h>
+#include <malloc.h>
+
+int main()
+{
+	// out will be what's returned
+	int n = 0;
+	unsigned long *out = malloc(sizeof(unsigned long) * 7);
+	unsigned long *in;
+	printf("%ld\n", out[0]);
+	syscall(SYS_MEM_STATS, out, in, sizeof(unsigned long) * 7);
+	printf("%ld\n", out[0]);
+	printf("%ld\n", out[1]);
+	free(out);
+	return 0;
+}
+}}}
+
+This doesn't seem to do anything (values are zero after the system call), for perhaps several reasons:
+* Swap space isn't created anywhere
+* The call to `copy_to_user` may not be functioning correctly
 
 = Part II =
 
